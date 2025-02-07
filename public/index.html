@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zenstudy AI</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        #chat-container { max-width: 600px; margin: auto; padding: 20px; }
+        .message { padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .user { background-color: #e1ffc7; }
+        .chatbot { background-color: #f1f1f1; }
+        #user-input { width: 100%; padding: 10px; margin-top: 20px; }
+        button { padding: 10px 20px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div id="chat-container">
+        <div id="chat-box"></div>
+        <input type="text" id="user-input" placeholder="Type your message..." />
+        <button id="send-button">Send</button>
+    </div>
+
+    <script>
+        const sendButton = document.getElementById('send-button');
+        const userInput = document.getElementById('user-input');
+        const chatBox = document.getElementById('chat-box');
+
+        sendButton.addEventListener('click', async () => {
+            const message = userInput.value;
+            if (message.trim() === '') return;
+
+            chatBox.innerHTML += `<div class="message user">${message}</div>`;
+            userInput.value = '';
+
+            try {
+                const response = await fetch('/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message })
+                });
+
+                const data = await response.json();
+                const chatbotMessage = data.reply;
+
+                // Display chatbot's reply
+                chatBox.innerHTML += `<div class="message chatbot">${chatbotMessage}</div>`;
+                chatBox.scrollTop = chatBox.scrollHeight;  
+            } catch (error) {
+                console.error(error);
+                chatBox.innerHTML += `<div class="message chatbot">Sorry, there was an error.</div>`;
+            }
+        });
+    </script>
+</body>
+</html>
